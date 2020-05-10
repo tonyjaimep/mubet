@@ -48,14 +48,12 @@ class ParadaController extends Controller
         $paradasOrigen = Parada::near($coordenadasOrigen['lat'], $coordenadasOrigen['lng']);
         $paradasDestino = Parada::near($coordenadasDestino['lat'], $coordenadasDestino['lng']);
 
-        $rutasADestino = $paradasDestino->pluck('id_ruta');
-
-        $paradasOrigen = $paradasOrigen->whereIn('id_ruta', $rutasADestino);
+        $paradasResultado = Parada::connects($coordenadasOrigen, $coordenadasDestino)->with('ruta');
 
         if (count($paradasOrigen)) {
             return response()->json([
                 'success' => true,
-                'data' => $paradasOrigen->with('ruta');
+                'data' => $paradasResultado;
             ]);
         }
     }

@@ -2,7 +2,9 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Parada extends Model
 {
@@ -28,19 +30,54 @@ class Parada extends Model
         return $this->belongsTo(Parada::class, 'id_parada_anterior');
     }
 
+    /*
+    @param Builder $query Query Builder
+    @param number $latitude
+    @param number $longitude
+    @param number $radius in meters to point
+
+    filtra resultados a estaciones cerca de las coordenadas dadas, con un radio
+    de $radius de tolerancia
+    */
+    public function scopeCercaDe(Builder $query, $lat, $lng, $radius=200)
+    {
+        $lngRadius = $latRadius = $radius * 360 / 40075000;
+
+        $query->join(DB::raw('estaciones as e'), 'e.id', '=', 'id_estacion');
+
+        $query->whereBetween('e.lat', [$lat - $latRadius, $lat + $latRadius]);
+        $query->whereBetween('e.lng', [$lng - $lngRadius, $lng + $lngRadius]);
+        /*
+        Query realizada
+        WHERE lat BETWEEN ($lat - $latRadius, $lat + $latRadius)
+        WHERE lng BETWEEN ($lng - $lngRadius, $lng + $lngRadius)
+        */
+    }
+
+
     public function scopeConecta($query, $coordenadasOrigen, $coordenadasDestino)
     {
         $ids = [];
         // obtener paradas agrupadas por rutas
-        $paradasOrigen = Parada::near($coordenadasOrigen)
-            ->groupBy('id_ruta')
-            ->get(['id', 'id_ruta_siguiente', 'id_ruta_anterior']);
-        $paradasDestino = Parada::near($coordenadasDestino)
-            ->groupBy('id_ruta')
-            ->get(['id', 'id_ruta_siguiente', 'id_ruta_anterior']);
+        $paradasCercadeOrigen = Parada::cercaDe($coordenadasOrigen['lat'], $coordenadasOrigen['lng'])
+            ->groupBy(DB::raw('paradas.id_ruta, paradas.id'))
+            ->get([
+                'paradas.id',
+                'paradas.id_ruta',
+                'paradas.id_parada_siguiente',
+                'paradas.id_parada_anterior'
+            ]);
+        $paradasCercadeDestino = Parada::cercaDe($coordenadasDestino['lat'], $coordenadasDestino['lng'])
+            ->groupBy(DB::raw('paradas.id_ruta, paradas.id'))
+            ->get([
+                'paradas.id',
+                'paradas.id_ruta',
+                'paradas.id_parada_siguiente',
+                'paradas.id_parada_anterior'
+            ]);
 
-        foreach ($paradasDestino as $paradaCercaDeDestino) {
-            foreach ($paradasOrigen as $paradaCercaDeOrigen) {
+        foreach ($paradasCercadeDestino as $paradaCercaDeDestino) {
+            foreach ($paradasCercadeOrigen as $paradaCercaDeOrigen) {
                 if ($paradaCercaDeOrigen->llevaHacia($paradaCercaDeDestino)) {
                     array_push($ids, $paradaCercaDeOrigen->id);
                 }
@@ -56,7 +93,6 @@ class Parada extends Model
             if ($parada->id_parada_anterior == $this->id
                 || $parada->id_parada_anterior == $this->id_parada_siguiente) {
                 return true;
-                delete ()
             } else {
                 return $this->llevaHacia($parada->paradaAnterior);
             }

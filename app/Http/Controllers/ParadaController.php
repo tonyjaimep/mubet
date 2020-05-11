@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Spatie\Geocoder\Geocoder;
+
+use App\Parada;
 
 class ParadaController extends Controller
 {
@@ -37,7 +40,14 @@ class ParadaController extends Controller
             }
         }
 
+        if (!isset($client)) {
+            $client = new \GuzzleHttp\Client();
+            $geocoder = new Geocoder($client);
+            $geocoder->setApiKey(config('geocoder.key'));
+        }
+
         $result = $geocoder->getCoordinatesForAddress($request->destino);
+
         if ($result) {
             $coordenadasDestino['lat'] = $result['lat'];
             $coordenadasDestino['lng'] = $result['lng'];
@@ -45,16 +55,15 @@ class ParadaController extends Controller
             return response(json_encode(['success' => false, 'message' => 'Destino no encontrado']), 404);
         }
 
-        $paradasOrigen = Parada::near($coordenadasOrigen['lat'], $coordenadasOrigen['lng']);
-        $paradasDestino = Parada::near($coordenadasDestino['lat'], $coordenadasDestino['lng']);
+        $paradasResultado = Parada::conecta($coordenadasOrigen, $coordenadasDestino);
+        $paradasResultado = $paradasResultado->with(['ruta', 'estacion'])->get();
 
-        $paradasResultado = Parada::connects($coordenadasOrigen, $coordenadasDestino)->with('ruta');
-
-        if (count($paradasOrigen)) {
+        if (count($paradasResultado)) {
             return response()->json([
                 'success' => true,
-                'data' => $paradasResultado;
+                'data' => $paradasResultado
             ]);
         }
+        return response(json_encode(['success' => false, 'message' => 'No se encontró una ruta entre el origen y el destino dados.']), 404);
     }
 }

@@ -5,11 +5,15 @@
           <div class="col">{{ ruta.nombre }}</div>
           <div class="col" v-if="ruta.alias">{{ ruta.alias }}</div>
       </div>
+      <coords-input/>
   </div>
 </template>
 
 <script>
+import CoordsInput from '../components/CoordsInput'
+
 export default {
+    components: { CoordsInput },
     data() {
         return {
             paradas: []
@@ -29,6 +33,3 @@ export default {
     }
 }
 </script>
-
-<style lang="css" scoped>
-</style>

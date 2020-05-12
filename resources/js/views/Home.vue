@@ -38,11 +38,12 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <h5>{{ parada.ruta.nombre }}</h5>
+                                        <span class="badge badge-primary" v-if="parada.tarifa">${{ parada.tarifa }}</span>
                                         <h6 v-if="parada.ruta.alias">{{ parada.ruta.alias }}</h6>
                                         <h6>{{ parada.estacion.direccion }}</h6>
                                         <code>
                                             lat: {{ parada.estacion.lat }}<br>
-                                            lng: {{ parada.estacion.lat }}
+                                            lng: {{ parada.estacion.lng }}
                                         </code>
                                     </div>
                                 </div>

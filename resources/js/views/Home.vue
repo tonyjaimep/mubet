@@ -22,7 +22,7 @@
                     <div class="col-sm-10 col-lg-8">
                         <div class="alert alert-warning" v-if="!paradas.length">
                             <div class="row">
-                                <div class="d-none d-sm-block col-sm-3 text-center pt-5">
+                                <div class="d-none d-sm-block col-sm-3 text-center pt-2">
                                     <alert-triangle-icon size="3x"/>
                                 </div>
                                 <div class="col-sm-9">

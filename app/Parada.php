@@ -30,6 +30,20 @@ class Parada extends Model
         return $this->belongsTo(Parada::class, 'id_parada_anterior');
     }
 
+    public function setIdParadaAnteriorAttribute($id)
+    {
+        $this->attributes['id_parada_anterior'] = $id;
+        $anterior = Parada::find($id);
+        $anterior->attributes['id_parada_siguiente'] = $this->id;
+    }
+
+    public function setIdParadaSiguienteAttribute($id)
+    {
+        $this->attributes['id_parada_siguiente'] = $id;
+        $siguiente = Parada::find($id);
+        $siguiente->attributes['id_parada_anterior'] = $this->id;
+    }
+
     /*
     @param Builder $query Query Builder
     @param number $latitude

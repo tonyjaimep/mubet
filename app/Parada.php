@@ -35,6 +35,7 @@ class Parada extends Model
         $this->attributes['id_parada_anterior'] = $id;
         $anterior = Parada::find($id);
         $anterior->attributes['id_parada_siguiente'] = $this->id;
+        $anterior->save();
     }
 
     public function setIdParadaSiguienteAttribute($id)
@@ -42,6 +43,7 @@ class Parada extends Model
         $this->attributes['id_parada_siguiente'] = $id;
         $siguiente = Parada::find($id);
         $siguiente->attributes['id_parada_anterior'] = $this->id;
+        $siguiente->save();
     }
 
     /*

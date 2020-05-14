@@ -10,7 +10,7 @@
         </div>
         <div class="lookup-dotted-line my-3"></div>
         <div class="input-group">
-            <input type="text" class="shadow-lg form-control" v-model="destino" placeholder="Busca tu destino" name="origen">
+            <input type="text" class="shadow-lg form-control" v-model="destino" placeholder="Busca tu destino" name="destino">
             <div class="input-group-append">
                 <button class="btn btn-primary" type="submit">
                     <search-icon size="1x"></search-icon>

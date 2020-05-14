@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="col-sm-9">
                                         <h5>{{ parada.ruta.nombre }}</h5>
-                                        <span class="badge badge-primary" v-if="parada.tarifa">${{ parada.tarifa }}</span>
+                                        <span class="badge badge-primary" v-if="parada.ruta.tarifa">${{ parada.ruta.tarifa }}</span>
                                         <h6 v-if="parada.ruta.alias">{{ parada.ruta.alias }}</h6>
                                         <h6>{{ parada.estacion.direccion }}</h6>
                                         <code>
